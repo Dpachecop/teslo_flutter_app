@@ -10,13 +10,12 @@ void main() async {
   runApp(ProviderScope(child: const MainApp()));
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends ConsumerWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    print('API URL: ${Enviroment.apiUrl}');
-    print("hola mundo");
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appRouter = ref.watch(goRouterProvider);
     return MaterialApp.router(
       routerConfig: appRouter,
       theme: AppTheme().getTheme(),

@@ -8,9 +8,25 @@ import '../../domain/domain.dart';
 class AuthDatasourcesImpl extends AuthDatasource {
   final dio = Dio(BaseOptions(baseUrl: Enviroment.apiUrl));
   @override
-  Future<User> checkAuthStatus(String token) {
-    // TODO: implement checkAuthStatus
-    throw UnimplementedError();
+  Future<User> checkAuthStatus(String token) async {
+    try {
+      final response = await dio.get(
+        '/auth/check-status',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      final user = UserMapper.userJsonToEntity(response.data);
+      return user;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw CustomError('token no valido');
+      }
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw CustomError('Revisa tu conexión a internet');
+      }
+      throw Exception();
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   @override
@@ -22,9 +38,18 @@ class AuthDatasourcesImpl extends AuthDatasource {
       );
       final user = UserMapper.userJsonToEntity(response.data);
       return user;
-      // ignore: empty_catches
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw CustomError(
+          e.response?.data['message'] ?? 'Error no identificado',
+        );
+      }
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw CustomError('Revisa tu conexión a internet');
+      }
+      throw Exception();
     } catch (e) {
-      throw WrongCredentials();
+      throw Exception();
     }
   }
 

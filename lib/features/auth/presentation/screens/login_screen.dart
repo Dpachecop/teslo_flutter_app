@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_flutter_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:teslo_flutter_app/features/auth/presentation/providers/login_form_provider.dart';
 import 'package:teslo_flutter_app/features/shared/widgets/custom_filled_button.dart';
 import 'package:teslo_flutter_app/features/shared/widgets/custom_text_form_field.dart';
@@ -56,9 +57,27 @@ class LoginScreen extends StatelessWidget {
 class _LoginForm extends ConsumerWidget {
   const _LoginForm();
 
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginForm = ref.watch(loginFormProvider);
+
+    ref.listen(authProvider, (previous, next) {
+      if (next.errorMessage.isEmpty) return;
+      showSnackBar(context, next.errorMessage);
+    });
     final textStyles = Theme.of(context).textTheme;
 
     return Padding(
@@ -95,7 +114,10 @@ class _LoginForm extends ConsumerWidget {
               text: 'Ingresar',
               buttonColor: Colors.black,
               onPressed:
-                  () => ref.read(loginFormProvider.notifier).onFormSubmit(),
+                  () =>
+                      ref
+                          .read(loginFormProvider.notifier)
+                          .onFormSubmit(), // Si está haciendo el post no se puede volver a apretar
             ),
           ),
 
