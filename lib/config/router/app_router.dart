@@ -5,6 +5,7 @@ import 'package:teslo_flutter_app/features/auth/presentation/providers/auth_prov
 import 'package:teslo_flutter_app/features/auth/presentation/screens/check_auth_status_screen.dart';
 import 'package:teslo_flutter_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:teslo_flutter_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:teslo_flutter_app/features/products/presentation/screens/product_screen.dart';
 import 'package:teslo_flutter_app/features/products/presentation/screens/products_screen.dart';
 
 final goRouterProvider = Provider((ref) {
@@ -28,6 +29,14 @@ final goRouterProvider = Provider((ref) {
 
       ///* Product Routes
       GoRoute(path: '/', builder: (context, state) => const ProductsScreen()),
+
+      GoRoute(
+        path: '/product/:id',
+        builder:
+            (context, state) => ProductScreen(
+              productId: state.pathParameters['id'] ?? 'no-id',
+              ),
+      ),
     ],
 
     redirect: (context, state) {
